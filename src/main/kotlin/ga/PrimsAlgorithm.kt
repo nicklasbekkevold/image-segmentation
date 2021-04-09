@@ -64,7 +64,7 @@ object PrimsAlgorithm {
             segments[i] = segmentId
 
             var currentNode = genotype[i] + image.indexToCoordinate(i)
-            while (segments[currentNode.index] != -1) {
+            while (segments[currentNode.index] == -1) {
                 currentSegment.add(currentNode.index)
                 segments[currentNode.index] = segmentId
                 currentNode = genotype[currentNode.index] + currentNode
@@ -87,10 +87,9 @@ object PrimsAlgorithm {
     }
 
     private fun rgbDistance(nodes: Set<Node>): Float {
-        require(nodes.size == 2)
         val (u, v) = nodes.toList()
-        val uColor = image[u.first, u.second].toFloat()
-        val vColor = image[v.first, v.second].toFloat()
+        val uColor = image[u.index].toFloat()
+        val vColor = image[v.index].toFloat()
         return hypot(uColor, vColor)
     }
 
