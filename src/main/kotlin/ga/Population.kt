@@ -14,7 +14,6 @@ class Population(private val populationSize: Int) {
         val individuals = mutableListOf<Individual>()
         for (individual in 0 until populationSize) {
             individuals.add(Individual())
-            println(individuals[individual])
         }
         population = individuals
     }

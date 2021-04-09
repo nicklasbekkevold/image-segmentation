@@ -5,7 +5,7 @@ const val imageDirectory = "86016"
 
 fun main() {
     val generations = 100
-    val populationSize = 1
+    val populationSize = 10
     val crossoverRate = 0.8f
     val mutationRate = 0.2f
     val elitism = true

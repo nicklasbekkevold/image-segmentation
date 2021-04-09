@@ -1,6 +1,5 @@
 package ga
 
-import domain.Image
 import kotlin.random.Random
 
 class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
@@ -72,5 +71,9 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
             }
             else -> 0
         }
+    }
+
+    override fun toString(): String {
+        return "Individual(rank=$rank, segments=${phenotype.toSet()})"
     }
 }
