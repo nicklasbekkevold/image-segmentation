@@ -16,6 +16,10 @@ class Image(image: BufferedImage) {
         }
     }
 
+    operator fun get(index: Int): Int {
+        return pixels[index / width][index % width]
+    }
+
     operator fun get(x: Int, y: Int): Int {
         return pixels[y][x]
     }
