@@ -1,7 +1,7 @@
 package ga
 
 import domain.Image
-import getTestImageFromDirectory
+import domain.index
 import imageDirectory
 import java.util.*
 import kotlin.random.Random
@@ -10,14 +10,13 @@ typealias Node = Pair<Int, Int>
 
 object PrimsAlgorithm {
 
-    private val image: Image = getTestImageFromDirectory(imageDirectory)
-    private val width: Int = image.width
-    private val height: Int = image.height
+    private val image = Image
+    private val width = image.width
+    private val height = image.height
     private val memoizedWeights: MutableMap<Set<Node>, Float> = mutableMapOf()
     private val nodes = ((0 until width).flatMap { x -> (0 until height).map { y -> Pair(x, y) } })
 
     init {
-
         println("Prims algorithm initialized on image $imageDirectory (${width}x${height})")
     }
 
@@ -99,9 +98,4 @@ object PrimsAlgorithm {
         val vColor = image[v.index]
         return Image.colorDistanceRGB(uColor, vColor)
     }
-
-    private val Node.index: Int
-        get() {
-            return this.first + this.second * width  // x + y * width
-        }
 }

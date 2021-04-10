@@ -9,7 +9,7 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
     private val phenotype: List<Int> = PrimsAlgorithm.getSegments(genotype)
 
     private val overallDeviation = 0 // min
-    private val edgeValue = 0 // max
+    private val edgeValue = 0 // min
     private val connectivityMeasure = 0 // min
 
     private val rank = 0

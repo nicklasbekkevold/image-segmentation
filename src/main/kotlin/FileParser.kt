@@ -18,10 +18,9 @@ fun getImageDirectories(): List<String> {
         .toList()
 }
 
-fun getTestImageFromDirectory(directoryName: String): Image {
+fun getTestImageFromDirectory(directoryName: String): BufferedImage {
     val imagePath = "$imagesPath/$directoryName/Test image.jpg"
-    val bufferedImage = ImageIO.read(File(imagePath))
-    return Image(bufferedImage)
+    return ImageIO.read(File(imagePath))
 }
 
 fun writeImageToFile(filename: String, image: Image) {
