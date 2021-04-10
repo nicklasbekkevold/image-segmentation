@@ -1,5 +1,6 @@
 package domain
 
+import java.awt.Color
 import java.awt.image.BufferedImage
 
 class Image(image: BufferedImage) {
@@ -14,6 +15,14 @@ class Image(image: BufferedImage) {
                 pixels[y][x] = image.getRGB(x, y)
             }
         }
+    }
+
+    fun intToRGB(intRGB: Int): Triple<Int, Int, Int> {
+        return Triple((intRGB shr 16) and 255, (intRGB shr 8) and 255, (intRGB) and 255)
+    }
+
+    fun RGBToInt(red: Int, green: Int, blue: Int): Int {
+        return ((red and 255) shl 16) or ((green and 255) shl 8) or (blue and 255 )
     }
 
     operator fun get(index: Int): Int {

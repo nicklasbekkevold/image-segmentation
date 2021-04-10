@@ -21,6 +21,7 @@ object PrimsAlgorithm {
     private val nodes = ((0 until width).flatMap { x -> (0 until height).map { y -> Pair(x, y) } })
 
     init {
+
         println("Prims algorithm initialized on image $imageDirectory (${width}x${height})")
     }
 
@@ -30,6 +31,7 @@ object PrimsAlgorithm {
         val keys: MutableMap<Node, Float> = mutableMapOf<Node, Float>().withDefault { Float.MAX_VALUE }
         val predecessors: MutableMap<Node, Node> = mutableMapOf()
         val Q: PriorityQueue<Node> = PriorityQueue(compareBy { keys.getValue(it) })
+        val highestWeights: PriorityQueue<Node> = PriorityQueue(compareBy { -keys.getValue(it) })
 
         val root = Pair(Random.nextInt(width), Random.nextInt(height))
         keys[root] = 0F
@@ -44,9 +46,18 @@ object PrimsAlgorithm {
                         genotype[v.index] = edge.opposite()
                         predecessors[v] = u
                         keys[v] = w(u, v)
+                        if (!highestWeights.contains(v)) {
+                            highestWeights.add(v)
+                        }
                     }
                 }
             }
+        }
+        val numberOfSegments = 5
+        for (i in 0 until numberOfSegments) {
+            val v = highestWeights.remove()
+            val u = predecessors[v] ?: continue
+            genotype[u.index] = Gene.NONE
         }
         return genotype
     }
@@ -70,7 +81,7 @@ object PrimsAlgorithm {
                 currentNode = genotype[currentNode.index] + currentNode
             }
 
-            if (segments[i] == segments[currentNode.index]) {
+            if (segments[i] != segments[currentNode.index]) {
                 val segment = segments[currentNode.index]
                 for (node in currentSegment) {
                     segments[node] = segment
@@ -90,7 +101,7 @@ object PrimsAlgorithm {
         val (u, v) = nodes.toList()
         val uColor = image[u.index].toFloat()
         val vColor = image[v.index].toFloat()
-        return hypot(uColor, vColor)
+        return abs(uColor - vColor)
     }
 
     private val Node.index: Int
