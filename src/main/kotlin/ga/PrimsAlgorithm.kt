@@ -3,11 +3,7 @@ package ga
 import domain.Image
 import getTestImageFromDirectory
 import imageDirectory
-import javafx.scene.image.PixelReader
-import javafx.scene.image.WritableImage
 import java.util.*
-import javax.lang.model.type.UnionType
-import kotlin.math.*
 import kotlin.random.Random
 
 typealias Node = Pair<Int, Int>
@@ -99,9 +95,9 @@ object PrimsAlgorithm {
 
     private fun rgbDistance(nodes: Set<Node>): Float {
         val (u, v) = nodes.toList()
-        val uColor = image[u.index].toFloat()
-        val vColor = image[v.index].toFloat()
-        return abs(uColor - vColor)
+        val uColor = image[u.index]
+        val vColor = image[v.index]
+        return Image.colorDistanceRGB(uColor, vColor)
     }
 
     private val Node.index: Int
