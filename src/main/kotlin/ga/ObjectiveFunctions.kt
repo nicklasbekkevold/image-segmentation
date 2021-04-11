@@ -1,7 +1,8 @@
 package ga
 
 import domain.Image
-import domain.neighbors
+import domain.mooreNeighborhood
+import domain.vonNeumannNeighborhood
 
 enum class ObjectiveFunctions {
     overallDeviation {
@@ -20,26 +21,35 @@ enum class ObjectiveFunctions {
                 counts[C[i]]++
             }
             val centroids = segments.map { Image.RGBToInt(reds[it] / counts[it], greens[it] / counts[it], blues[it] / counts[it]) }
-            return image.mapIndexed { index, pixel -> Image.colorDistanceRGB(pixel, centroids[index]) }.sum()
+            return image
+                .mapIndexed { index, pixel -> Image.colorDistanceRGB(pixel, centroids[index]) }
+                .reduce { accumulator, distance -> accumulator  + distance }
         }
     },
     edgeValue {
-        // maximize
+        // minimize
         override fun apply(image: Image, C: List<Int>): Float {
-            var sum = 0f
+            var edgeValue = 0f
             for (pixel in image) {
-                for (neighbor in pixel.neighbors) {
-                    println("Hi there")
+                for (neighbor in pixel.vonNeumannNeighborhood) {
+                    edgeValue -= (if (C[pixel] != C[neighbor]) Image.colorDistanceRGB(pixel, neighbor) else 0f)
                 }
             }
-            return sum
+            return edgeValue
         }
 
     },
     connectivityMeasure {
         // minimize
         override fun apply(image: Image, C: List<Int>): Float {
-            TODO("Not yet implemented")
+            var connectivity = 0f
+            for (pixel in image) {
+                var notConnectedNeighbours = 0
+                for (neighbor in pixel.mooreNeighborhood) {
+                    connectivity += (if (C[pixel] != C[neighbor]) 1f / ++notConnectedNeighbours else 0f)
+                }
+            }
+            return connectivity
         }
     };
     abstract fun apply(image: Image, C: List<Int>): Float

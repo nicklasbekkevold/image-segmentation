@@ -6,15 +6,29 @@ import imageDirectory
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-val Int.neighbors: List<Int>
+val Int.vonNeumannNeighborhood: List<Int>
     get() {
         return Gene.values().map { it + Image.indexToCoordinate(this) }.filter { (it.first in 0..Image.width) and (it.second in 0..Image.height) }.map { it.first + it.second * Image.width }
     }
 
-
-val Pair<Int, Int>.neighbors: List<Pair<Int, Int>>
+val Pair<Int, Int>.vonNeumannNeighborhood: List<Pair<Int, Int>>
     get() {
         return Gene.values().map { it + this }.filter { (it.first in 0..Image.width) and (it.second in 0..Image.height) }
+    }
+
+val Int.mooreNeighborhood: List<Int>
+    get() {
+        val mooreNeighborhood = mutableListOf<Int>()
+        val (x, y) = Image.indexToCoordinate(this)
+        if (y > 0) mooreNeighborhood.add(this - Image.width) // N
+        if (x < Image.width - 1 && y > 0) mooreNeighborhood.add(this + 1 - Image.width) // NE
+        if (x < Image.width - 1) mooreNeighborhood.add(this + 1) // E
+        if (x < Image.width - 1 && y < Image.height - 1) mooreNeighborhood.add(this + 1 + Image.width) // SE
+        if (this % Image.width != 0 && y < Image.height - 1) mooreNeighborhood.add(this + Image.width) // S
+        if (x > 0 && y < Image.height - 1) mooreNeighborhood.add(this - 1 + Image.width) // SW
+        if (x > 0) mooreNeighborhood.add(this - 1) // W
+        if (x > 0 && y > 0) mooreNeighborhood.add(this - 1 - Image.width) // NW
+        return mooreNeighborhood
     }
 
 val Pair<Int, Int>.index: Int
