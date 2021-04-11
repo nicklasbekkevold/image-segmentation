@@ -1,6 +1,8 @@
 package ga
 
 import domain.Image
+import tournamentSize
+import kotlin.random.Random
 
 class Population(private val populationSize: Int) {
 
@@ -23,8 +25,14 @@ class Population(private val populationSize: Int) {
         return generation
     }
 
-    fun evaluate() { }
-    fun select() { }
+    fun evaluate() {
+
+    }
+
+    fun select(): List<Individual> = population.map { tournamentSelection(tournamentSize) }
+
+    private fun tournamentSelection(k: Int) = (1..k).map { population.random() }.sorted()[0]
+
     fun replace() { generation++ }
 
     override fun toString(): String {

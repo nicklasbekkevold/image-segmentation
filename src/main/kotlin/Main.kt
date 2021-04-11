@@ -2,6 +2,7 @@ import ga.GeneticAlgorithm
 import javafx.scene.image.WritableImage
 
 const val imageDirectory = "86016"
+const val tournamentSize = 4
 
 fun main() {
     val generations = 100

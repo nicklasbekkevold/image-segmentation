@@ -27,6 +27,7 @@ class GeneticAlgorithm(
     }
 
     fun update(): Population {
+        val matingPool = population.select()
         population.replace()
         return population
     }
