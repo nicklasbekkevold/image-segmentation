@@ -31,8 +31,8 @@ enum class ObjectiveFunctions {
         override fun apply(image: Image, C: List<Int>): Float {
             var edgeValue = 0f
             for (pixel in image) {
-                for (neighbor in pixel.vonNeumannNeighborhood) {
-                    edgeValue -= (if (C[pixel] != C[neighbor]) Image.colorDistanceRGB(pixel, neighbor) else 0f)
+                for ((neighbor, _) in pixel.vonNeumannNeighborhood) {
+                    edgeValue -= (if (C[pixel] != C[neighbor]) Image.w(pixel, neighbor) else 0f)
                 }
             }
             return edgeValue
