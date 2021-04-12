@@ -2,100 +2,66 @@ package ga
 
 import domain.Image
 import domain.index
+import domain.vonNeumannNeighborhood
 import imageDirectory
 import java.util.*
 import kotlin.random.Random
 
-typealias Node = Pair<Int, Int>
+typealias Node = Int
 
-object PrimsAlgorithm {
+private val nodes = (0 until Image.size).toList()
 
-    private val image = Image
-    private val width = image.width
-    private val height = image.height
-    private val memoizedWeights: MutableMap<Set<Node>, Float> = mutableMapOf()
-    private val nodes = ((0 until width).flatMap { x -> (0 until height).map { y -> Pair(x, y) } })
+fun primsAlgorithm(): List<Gene> {
+    val genotype = MutableList(Image.width * Image.height) { Gene.NONE }
 
-    init {
-        println("Prims algorithm initialized on image $imageDirectory (${width}x${height})")
-    }
+    val keys: MutableMap<Node, Float> = mutableMapOf<Node, Float>().withDefault { Float.MAX_VALUE }
+    val predecessors: MutableMap<Node, Node> = mutableMapOf()
+    val Q: PriorityQueue<Node> = PriorityQueue(compareBy { keys.getValue(it) })
 
-    fun create(): List<Gene> {
-        val genotype = MutableList(width * height) { Gene.NONE }
+    val root = nodes.random()
+    keys[root] = 0F
+    Q.addAll(nodes)
 
-        val keys: MutableMap<Node, Float> = mutableMapOf<Node, Float>().withDefault { Float.MAX_VALUE }
-        val predecessors: MutableMap<Node, Node> = mutableMapOf()
-        val Q: PriorityQueue<Node> = PriorityQueue(compareBy { keys.getValue(it) })
-        val highestWeights: PriorityQueue<Node> = PriorityQueue(compareBy { -keys.getValue(it) })
-
-        val root = Pair(Random.nextInt(width), Random.nextInt(height))
-        keys[root] = 0F
-        Q.addAll(nodes)
-
-        while (Q.isNotEmpty()) {
-            val u = Q.remove()
-            for (edge in Gene.values()) {
-                val v = edge + u
-                if (v.first in 0..width && v.second in 0..height) {
-                    if (v in Q && w(u, v) < keys.getValue(v)) {
-                        genotype[v.index] = edge.opposite()
-                        predecessors[v] = u
-                        keys[v] = w(u, v)
-                        if (!highestWeights.contains(v)) {
-                            highestWeights.add(v)
-                        }
-                    }
-                }
+    while (Q.isNotEmpty()) {
+        val u = Q.remove()
+        for ((v, e) in u.vonNeumannNeighborhood) {
+            if (v in Q && Image.w(u, v) < keys.getValue(v)) {
+                genotype[v] = e.opposite()
+                predecessors[v] = u
+                keys[v] = Image.w(u, v)
             }
         }
-        val numberOfSegments = 5
-        for (i in 0 until numberOfSegments) {
-            val v = highestWeights.remove()
-            val u = predecessors[v] ?: continue
-            genotype[u.index] = Gene.NONE
+    }
+    return genotype
+}
+
+fun getSegments(genotype: List<Gene>): List<Int> {
+    val segments = MutableList(genotype.size) { -1 }
+    var segmentId = 0
+
+    for (i in genotype.indices) {
+        if (segments[i] != -1) {
+            continue
         }
-        return genotype
-    }
 
-    fun getSegments(genotype: List<Gene>): List<Int> {
-        val segments = MutableList(genotype.size) { -1 }
-        var segmentId = 0
+        val currentSegment = mutableListOf<Int>()
+        segments[i] = segmentId
 
-        for (i in genotype.indices) {
-            if (segments[i] != -1) {
-                continue
-            }
-
-            val currentSegment = mutableListOf<Int>()
-            segments[i] = segmentId
-
-            var currentNode = genotype[i] + image.indexToCoordinate(i)
-            while (segments[currentNode.index] == -1) {
-                currentSegment.add(currentNode.index)
-                segments[currentNode.index] = segmentId
-                currentNode = genotype[currentNode.index] + currentNode
-            }
-
-            if (segments[i] != segments[currentNode.index]) {
-                val segment = segments[currentNode.index]
-                for (node in currentSegment) {
-                    segments[node] = segment
-                }
-            } else {
-                segmentId++
-            }
+        var currentNode = genotype[i] + Image.indexToCoordinate(i)
+        while (segments[currentNode.index] == -1) {
+            currentSegment.add(currentNode.index)
+            segments[currentNode.index] = segmentId
+            currentNode = genotype[currentNode.index] + currentNode
         }
-        return segments
-    }
 
-    private fun w(u: Node, v: Node): Float {
-        return memoizedWeights.computeIfAbsent(setOf(u, v)) { rgbDistance(it) }
+        if (segments[i] != segments[currentNode.index]) {
+            val segment = segments[currentNode.index]
+            for (node in currentSegment) {
+                segments[node] = segment
+            }
+        } else {
+            segmentId++
+        }
     }
-
-    private fun rgbDistance(nodes: Set<Node>): Float {
-        val (u, v) = nodes.toList()
-        val uColor = image[u.index]
-        val vColor = image[v.index]
-        return Image.colorDistanceRGB(uColor, vColor)
-    }
+    return segments
 }

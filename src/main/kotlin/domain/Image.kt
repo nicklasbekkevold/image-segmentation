@@ -6,14 +6,15 @@ import imageDirectory
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-val Int.vonNeumannNeighborhood: List<Int>
+val Int.vonNeumannNeighborhood: List<Pair<Int, Gene>>
     get() {
-        return Gene.values().map { it + Image.indexToCoordinate(this) }.filter { (it.first in 0..Image.width) and (it.second in 0..Image.height) }.map { it.first + it.second * Image.width }
-    }
-
-val Pair<Int, Int>.vonNeumannNeighborhood: List<Pair<Int, Int>>
-    get() {
-        return Gene.values().map { it + this }.filter { (it.first in 0..Image.width) and (it.second in 0..Image.height) }
+        val vonNeumannNeighborhood = mutableListOf<Pair<Int, Gene>>()
+        val (x, y) = Image.indexToCoordinate(this)
+        if (y > 0) vonNeumannNeighborhood.add(Pair(this - Image.width, Gene.UP)) // N
+        if (x < Image.width - 1) vonNeumannNeighborhood.add(Pair(this + 1, Gene.RIGHT)) // E
+        if (this % Image.width != 0 && y < Image.height - 1) vonNeumannNeighborhood.add(Pair(this + Image.width, Gene.DOWN)) // S
+        if (x > 0) vonNeumannNeighborhood.add(Pair(this - 1, Gene.LEFT)) // W
+        return vonNeumannNeighborhood
     }
 
 val Int.mooreNeighborhood: List<Int>
@@ -43,6 +44,7 @@ object Image: Iterable<Int> {
     val height = image.height
     val size = width * height
     private val pixels = Array(height) { Array(width) { 0 } }
+    private val memoizedWeights: MutableMap<Set<Int>, Float> = mutableMapOf()
 
     init {
         for (y in 0 until height) {
@@ -50,6 +52,10 @@ object Image: Iterable<Int> {
                 pixels[y][x] = image.getRGB(x, y)
             }
         }
+    }
+
+    fun w(u: Int, v: Int): Float {
+        return memoizedWeights.computeIfAbsent(setOf(u, v)) { colorDistanceRGB(u, v) }
     }
 
     operator fun get(index: Int): Int {
