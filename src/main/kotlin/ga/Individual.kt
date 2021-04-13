@@ -4,17 +4,18 @@ import kotlin.random.Random
 
 class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
 
-    constructor() : this(PrimsAlgorithm.create())
+    constructor() : this(primsAlgorithm())
 
-    private val phenotype: List<Int> = PrimsAlgorithm.getSegments(genotype)
+    private val phenotype: List<Int> = getSegments(genotype)
 
     private val overallDeviation = 0 // min
     private val edgeValue = 0 // min
     private val connectivityMeasure = 0 // min
 
-    private val rank = 0
+    var rank = 0
     private val crowdingDistance = 0
 
+    // Just for fun. Renames .indices to .loci to match the nomenclature
     private val List<Gene>.loci: IntRange
         get() = this.indices
 
@@ -72,7 +73,7 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
         return hammingDistance
     }
 
-    infix fun Individual.dominates(other: Individual): Boolean {
+    infix fun dominates(other: Individual): Boolean {
         return (
                 overallDeviation <= other.overallDeviation &&
                 edgeValue <= other.edgeValue &&
@@ -99,4 +100,5 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
     override fun toString(): String {
         return "Individual(rank=$rank, segments=${phenotype.toSet()})"
     }
+
 }

@@ -4,7 +4,7 @@ import domain.Image
 import tournamentSize
 import kotlin.random.Random
 
-class Population(private val populationSize: Int) {
+class Population(private val populationSize: Int): Iterable<Individual> {
 
     private var generation = 0
     private var maxFitness = 1
@@ -42,5 +42,9 @@ class Population(private val populationSize: Int) {
             averageFitness=$averageFitness
             diversity=$diversity
         """.trimIndent()
+    }
+
+    override fun iterator(): Iterator<Individual> {
+        return population.iterator()
     }
 }

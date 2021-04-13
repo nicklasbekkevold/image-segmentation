@@ -19,14 +19,14 @@ fun primsAlgorithm(): List<Gene> {
     val Q: PriorityQueue<Node> = PriorityQueue(compareBy { keys.getValue(it) })
 
     val root = nodes.random()
-    keys[root] = 0F
+    keys[root] = 0f
     Q.addAll(nodes)
 
     while (Q.isNotEmpty()) {
         val u = Q.remove()
-        for ((v, e) in u.vonNeumannNeighborhood) {
+        for ((v, edge) in u.vonNeumannNeighborhood) {
             if (v in Q && Image.w(u, v) < keys.getValue(v)) {
-                genotype[v] = e.opposite()
+                genotype[v] = edge.opposite()
                 predecessors[v] = u
                 keys[v] = Image.w(u, v)
             }
