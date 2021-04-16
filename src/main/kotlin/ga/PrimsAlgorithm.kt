@@ -32,7 +32,7 @@ fun primsAlgorithm(): List<Gene> {
             }
         }
     }
-    return genotype
+    return Individual.correctBorderNodes(genotype)
 }
 
 fun getSegments(genotype: List<Gene>): List<Int> {
@@ -65,3 +65,6 @@ fun getSegments(genotype: List<Gene>): List<Int> {
     }
     return segments
 }
+
+
+

@@ -1,28 +1,29 @@
 package ga
 
-import domain.Image
 import tournamentSize
-import kotlin.random.Random
 
-class Population(private val populationSize: Int): Iterable<Individual> {
+class Population(
+    private val population: List<Individual>,
+    private var generation: Int
+    ): Iterable<Individual> {
 
-    private var generation = 0
-    private var maxFitness = 1
-    private var averageFitness = 2
-    private var diversity = 3
-    private val population: List<Individual>
+    constructor(populationSize: Int) : this((1..populationSize).map { Individual() }, 0)
 
-    init {
-        val individuals = mutableListOf<Individual>()
-        for (individual in 0 until populationSize) {
-            individuals.add(Individual())
-            println(individuals[individual])
-        }
-        population = individuals
-    }
+    private var maxFitness = 0
+    private var averageFitness = 0
+    private var diversity = 0
 
     fun getGeneration(): Int {
         return generation
+    }
+
+    val size: Int
+        get() {
+            return population.size
+        }
+
+    operator fun get(index: Int): Individual {
+        return population[index]
     }
 
     fun evaluate() {
@@ -33,7 +34,10 @@ class Population(private val populationSize: Int): Iterable<Individual> {
 
     private fun tournamentSelection(k: Int) = (1..k).map { population.random() }.sorted()[0]
 
-    fun replace() { generation++ }
+    fun replace(newPopulation: List<Individual>): Population {
+        generation++
+        return Population(newPopulation, generation)
+    }
 
     override fun toString(): String {
         return """
