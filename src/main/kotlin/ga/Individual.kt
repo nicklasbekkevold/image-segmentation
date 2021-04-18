@@ -5,7 +5,7 @@ import kotlin.random.Random
 
 class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
 
-    constructor() : this(primsAlgorithm())
+    constructor() : this(minimumSpanningTree().MST.genotype)
 
     val phenotype: List<Int> = getSegments(genotype)
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
@@ -69,9 +69,9 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
     }
 
     infix fun dominates(other: Individual): Boolean {
-        return objectiveValues
-            .filter { it.value <= other.getOrEvaluate(it.key) }
-            .any { it.value < other.getOrEvaluate(it.key) }
+        return ObjectiveFunction.values()
+            .filter { this.getOrEvaluate(it) <= other.getOrEvaluate(it) }
+            .any { this.getOrEvaluate(it) < other.getOrEvaluate(it) }
     }
 
     // Crowded-Comparison operator
