@@ -5,9 +5,9 @@ import kotlin.random.Random
 
 class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
 
-    constructor() : this(minimumSpanningTree().MST.genotype)
+    constructor() : this(minimumSpanningTree().genotype)
 
-    val phenotype: List<Int> = getSegments(genotype)
+    val phenotype: List<Int> = makeSegments(genotype)
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
 
     var rank = 0
@@ -41,11 +41,7 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
     }
 
     fun getOrEvaluate(objectiveFunction: ObjectiveFunction): Float {
-        return objectiveValues.computeIfAbsent(objectiveFunction) {  objectiveFunction.apply(this) }
-    }
-
-    fun compareToWith(other: Individual, objectiveFunction: ObjectiveFunction): Int {
-        return this.getOrEvaluate(objectiveFunction).compareTo(other.getOrEvaluate(objectiveFunction))
+        return objectiveValues.computeIfAbsent(objectiveFunction) { objectiveFunction.apply(this) }
     }
 
     fun crossoverAndMutate(other: Individual, crossoverRate: Float, mutationRate: Float): Pair<Individual, Individual> {
@@ -70,8 +66,12 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
 
     infix fun dominates(other: Individual): Boolean {
         return ObjectiveFunction.values()
-            .filter { this.getOrEvaluate(it) <= other.getOrEvaluate(it) }
-            .any { this.getOrEvaluate(it) < other.getOrEvaluate(it) }
+            .all { this.getOrEvaluate(it) <= other.getOrEvaluate(it) }
+            .and(ObjectiveFunction.values().any { this.getOrEvaluate(it) < other.getOrEvaluate(it) })
+    }
+
+    fun compareToWith(other: Individual, objectiveFunction: ObjectiveFunction): Int {
+        return this.getOrEvaluate(objectiveFunction).compareTo(other.getOrEvaluate(objectiveFunction))
     }
 
     // Crowded-Comparison operator
@@ -82,7 +82,7 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
     }
 
     override fun toString(): String {
-        return "Individual(rank=$rank, segments=${phenotype.toSet()})"
+        return "Individual(rank=$rank, crowdingDistance=$crowdingDistance, segments=${phenotype.toSet()})"
     }
 
 }

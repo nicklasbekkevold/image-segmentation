@@ -32,7 +32,7 @@ class GeneticAlgorithm() {
 
         val resultPopulation = mutableListOf<Individual>()
         var i = 0
-        while (resultPopulation.size + fronts[i].size < populationSize) {
+        while (resultPopulation.size + fronts[i].size <= populationSize) {
             crowdingDistanceAssignment(fronts[i])
             resultPopulation.addAll(fronts[i++])
         }
@@ -48,7 +48,7 @@ class GeneticAlgorithm() {
     private fun fastNonDominatedSort(population: List<Individual>): List<List<Individual>> {
         val S = mutableMapOf<Individual, MutableSet<Individual>>().withDefault { mutableSetOf() } // set of other solutions which is dominated by solution
         val n = mutableMapOf<Individual, Int>().withDefault { 0 } // number of other solutions which dominates solution
-        val F = mutableListOf<MutableList<Individual>>().also { it.add(mutableListOf()) } // 0-indexed
+        val fronts = mutableListOf<MutableList<Individual>>().also { it.add(mutableListOf()) } // 0-indexed
 
         for (p in population) {
             for (q in population) {
@@ -58,16 +58,16 @@ class GeneticAlgorithm() {
                     n[p] = n.getValue(p) + 1
                 }
             }
-            if (n[p] == 0) {
+            if (n.getValue(p) == 0) {
                 p.rank = 0
-                F[0].add(p)
+                fronts[0].add(p)
             }
         }
 
         var i = 0
-        while (F[i].size != 0) {
+        while (fronts[i].size != 0) {
             val updatedFront = mutableListOf<Individual>()
-            for (p in F[i]) {
+            for (p in fronts[i]) {
                 for (q in S.getValue(p)) {
                     n[q] = n.getValue(q) - 1
                     if (n.getValue(q) == 0) {
@@ -77,9 +77,9 @@ class GeneticAlgorithm() {
                 }
             }
             i++
-            F[i] = updatedFront
+            fronts.add(updatedFront)
         }
-        return F
+        return fronts
     }
 
     private fun crowdingDistanceAssignment(population: List<Individual>) {
