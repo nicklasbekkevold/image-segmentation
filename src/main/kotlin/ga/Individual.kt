@@ -1,13 +1,14 @@
 package ga
 
 import domain.Image
+import initialization
 import kotlin.random.Random
 
 class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
 
-    constructor() : this(minimumSpanningTree().genotype)
+    constructor() : this(makeGenotype(initialization))
 
-    val phenotype: List<Int> = makeSegments(genotype)
+    val phenotype: List<Int> = makePhenotype(genotype)
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
 
     var rank = 0
@@ -25,15 +26,15 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
                     correctedGenotype[i] = Gene.NONE
                 }
                 if (genotype[(Image.height - 1) * Image.width + i] == Gene.DOWN) {
-                    correctedGenotype[i] = Gene.NONE
+                    correctedGenotype[(Image.height - 1) * Image.width + i] = Gene.NONE
                 }
             }
             for (i in 0 until Image.height) {
                 if (genotype[i * Image.width] == Gene.LEFT) {
-                    correctedGenotype[i] = Gene.NONE
+                    correctedGenotype[i * Image.width] = Gene.NONE
                 }
                 if (genotype[(i + 1) * Image.width - 1] == Gene.RIGHT) {
-                    correctedGenotype[i] = Gene.NONE
+                    correctedGenotype[(i + 1) * Image.width - 1] = Gene.NONE
                 }
             }
             return correctedGenotype

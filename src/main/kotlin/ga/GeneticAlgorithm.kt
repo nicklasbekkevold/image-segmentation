@@ -25,8 +25,8 @@ class GeneticAlgorithm() {
     fun update(): Population {
         // Evaluation already done from previous loop
         val parents = population.select() // P_t
-//        val offsprings = population.recombination(parents) // Q_t
-        val combinedPopulation = parents + parents//+ offsprings // R_t
+        val offsprings = population.recombination(parents) // Q_t
+        val combinedPopulation = parents + offsprings//+ offsprings // R_t
 
         val fronts = fastNonDominatedSort(combinedPopulation)
 

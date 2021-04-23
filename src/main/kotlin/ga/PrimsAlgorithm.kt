@@ -3,6 +3,7 @@ package ga
 import domain.Image
 import domain.index
 import domain.vonNeumannNeighborhood
+import initialization
 import sun.security.provider.certpath.AdjacencyList
 import java.util.*
 import kotlin.math.abs
@@ -13,9 +14,41 @@ typealias Node = Int
 
 private val nodes = (0 until Image.size).toList()
 
-data class PSR_MST(val genotype: List<Gene>, val edgesList: List<Pair<Node, Node>>, val weightsList: List<Float>)
+fun makeGenotype(initialization: Initialization): List<Gene> {
+    return when (initialization) {
+        is Initialization.Random -> randomSpanningTree()
+        is Initialization.HeuristicPrim -> minimumSpanningTree()
+        is Initialization.HeuristicClustering -> sequentialClustering()
+    }
+}
 
-fun minimumSpanningTree(): PSR_MST {
+fun randomSpanningTree(): List<Gene> {
+    return Individual.correctBorderNodes((0 until Image.size).map { Gene.values().random() })
+}
+
+fun minimumSpanningTree(): List<Gene> {
+    val genotype = MutableList(Image.size) { Gene.NONE }
+
+    val keys = FloatArray(nodes.size) { Float.MAX_VALUE }
+    val cheapestNodes = PriorityQueue<Node>(compareBy { keys[it] })
+
+    val root = nodes.random()
+    keys[root] = 0f
+    cheapestNodes.addAll(nodes)
+
+    while (cheapestNodes.isNotEmpty()) {
+        val u = cheapestNodes.remove()
+        for ((v, edge) in u.vonNeumannNeighborhood) {
+            if (v in cheapestNodes && Image.w(u, v) < keys[v]) {
+                genotype[v] = edge.opposite()
+                keys[v] = Image.w(u, v)
+            }
+        }
+    }
+    return genotype
+}
+
+fun sequentialClustering(): List<Gene> {
     val genotype = MutableList(Image.size) { Gene.NONE }
 
     val keys = FloatArray(nodes.size) { Float.MAX_VALUE }
@@ -38,12 +71,6 @@ fun minimumSpanningTree(): PSR_MST {
             }
         }
     }
-    return sequentialClustering(PSR_MST(genotype, edgesList, weightsList))
-}
-
-fun sequentialClustering(PSR_MST: PSR_MST): PSR_MST {
-    val (_genotype, edgesList, weightsList) = PSR_MST
-    val genotype = mutableListOf<Gene>().also { it.addAll(_genotype) }
 
     val l = (sqrt(Image.size.toFloat()) / 2f).toInt()
     var sum = 0f
@@ -61,10 +88,10 @@ fun sequentialClustering(PSR_MST: PSR_MST): PSR_MST {
             genotype[v] = Gene.NONE
         }
     }
-    return PSR_MST(genotype, edgesList, weightsList)
+    return genotype
 }
 
-fun makeSegments(genotype: List<Gene>): List<Int> {
+fun makePhenotype(genotype: List<Gene>): List<Int> {
     val segments = MutableList(genotype.size) { -1 }
     var segmentId = 0
 
