@@ -1,10 +1,11 @@
 package ga
 
 import crossoverRate
+import initialization
 import mutationRate
 import populationSize
 
-class GeneticAlgorithm() {
+class GeneticAlgorithm {
 
     private var population: Population
 
@@ -18,7 +19,8 @@ class GeneticAlgorithm() {
             Genetic algorithm initialized with the following configuration
             ┝ population size: $populationSize
             ┝ crossover rate: $crossoverRate
-            ┕ mutation rate: $mutationRate
+            ┝ mutation rate: $mutationRate
+            ┕ initialization: ${initialization.name}
         """.trimIndent())
     }
 
@@ -39,47 +41,41 @@ class GeneticAlgorithm() {
 
         crowdingDistanceAssignment(fronts[i])
         val difference = populationSize - resultPopulation.size
-        resultPopulation.addAll(fronts[i].sorted().subList(0, difference - 1))
+        resultPopulation.addAll(fronts[i].sorted().subList(0, difference))
 
         population = population.replace(resultPopulation)
         return population
     }
 
     private fun fastNonDominatedSort(population: List<Individual>): List<List<Individual>> {
-        val S = mutableMapOf<Individual, MutableSet<Individual>>().withDefault { mutableSetOf() } // set of other solutions which is dominated by solution
-        val n = mutableMapOf<Individual, Int>().withDefault { 0 } // number of other solutions which dominates solution
-        val fronts = mutableListOf<MutableList<Individual>>().also { it.add(mutableListOf()) } // 0-indexed
-
-        for (p in population) {
-            for (q in population) {
+        population.forEach { it.reset() }
+        for(i in population.indices) {
+            val p = population[i]
+            for (j in i + 1 until population.size) {
+                val q = population[j]
                 if (p dominates q) {
-                    S[p] = S.getValue(p).also { it.add(q) }
+                    p.dominates.add(q)
+                    q.dominationCount++
                 } else if (q dominates p) {
-                    n[p] = n.getValue(p) + 1
+                    q.dominates.add(p)
+                    p.dominationCount++
+                } else {
+                    break
                 }
             }
-            if (n.getValue(p) == 0) {
-                p.rank = 0
-                fronts[0].add(p)
+            if (p.dominationCount == 0) {
+                p.rank = 1
             }
         }
-
-        var i = 0
-        while (fronts[i].size != 0) {
-            val updatedFront = mutableListOf<Individual>()
-            for (p in fronts[i]) {
-                for (q in S.getValue(p)) {
-                    n[q] = n.getValue(q) - 1
-                    if (n.getValue(q) == 0) {
-                        q.rank = i + 1
-                        updatedFront.add(q)
-                    }
+        for (p in population) {
+            for (individual in p.dominates) {
+                individual.dominationCount--
+                if (individual.dominationCount == 0)  {
+                    individual.rank = p.rank + 1
                 }
             }
-            i++
-            fronts.add(updatedFront)
         }
-        return fronts
+        return population.groupBy { it.rank }.toSortedMap().values.toList()
     }
 
     private fun crowdingDistanceAssignment(population: List<Individual>) {

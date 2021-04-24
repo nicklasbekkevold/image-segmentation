@@ -11,8 +11,10 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
     val phenotype: List<Int> = makePhenotype(genotype)
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
 
-    var rank = 0
-    var crowdingDistance = 0f
+    var rank = Int.MAX_VALUE
+    var crowdingDistance = Float.MIN_VALUE
+    var dominationCount = 0
+    var dominates = mutableListOf<Individual>()
 
     // Just for fun. Renames .indices to .loci to match the nomenclature
     private val List<Gene>.loci: IntRange
@@ -86,4 +88,10 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
         return "Individual(rank=$rank, crowdingDistance=$crowdingDistance, segments=${phenotype.toSet()})"
     }
 
+    fun reset() {
+        rank = Int.MAX_VALUE
+        crowdingDistance = Float.MIN_VALUE
+        dominationCount = 0
+        dominates = mutableListOf<Individual>()
+    }
 }
