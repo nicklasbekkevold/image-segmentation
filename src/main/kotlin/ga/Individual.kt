@@ -1,20 +1,26 @@
 package ga
 
 import domain.Image
+import domain.index
+import domain.twoConnectedNeighborhood
 import initialization
 import kotlin.random.Random
 
-class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
+class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : Comparable<Individual> {
 
+    constructor(genotype: List<Gene>) : this(genotype, makePhenotype(genotype))
     constructor() : this(makeGenotype(initialization))
 
-    val phenotype: List<Int> = makePhenotype(genotype)
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
 
     var rank = Int.MAX_VALUE
     var crowdingDistance = Float.MIN_VALUE
     var dominationCount = 0
     var dominates = mutableListOf<Individual>()
+
+    fun copy(): Individual {
+        return Individual(genotype, phenotype)
+    }
 
     // Just for fun. Renames .indices to .loci to match the nomenclature
     private val List<Gene>.loci: IntRange
@@ -43,8 +49,18 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
         }
     }
 
+    fun edgeAt(x: Int, y: Int): Boolean {
+        val pixel = Pair(x, y).index
+        for (pixelNeighbor in pixel.twoConnectedNeighborhood) {
+            if (phenotype[pixel] != phenotype[pixelNeighbor]) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun getOrEvaluate(objectiveFunction: ObjectiveFunction): Float {
-        return objectiveValues.computeIfAbsent(objectiveFunction) { objectiveFunction.apply(this) }
+        return objectiveValues.computeIfAbsent(objectiveFunction) { objectiveFunction.apply(phenotype) }
     }
 
     fun crossoverAndMutate(other: Individual, crossoverRate: Float, mutationRate: Float): Pair<Individual, Individual> {
@@ -92,6 +108,6 @@ class Individual(private val genotype: List<Gene>) : Comparable<Individual> {
         rank = Int.MAX_VALUE
         crowdingDistance = Float.MIN_VALUE
         dominationCount = 0
-        dominates = mutableListOf<Individual>()
+        dominates = mutableListOf()
     }
 }

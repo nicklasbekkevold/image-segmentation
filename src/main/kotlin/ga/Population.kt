@@ -17,11 +17,15 @@ class Population(private val population: List<Individual>, private val generatio
         return population[index]
     }
 
+    fun evaluate(): List<List<Individual>> {
+        return GeneticAlgorithm.fastNonDominatedSort(population)
+    }
+
     fun select(): List<Individual> = population.map { tournamentSelection(tournamentSize) }
 
-    private fun tournamentSelection(k: Int) = (1..k).map { population.random() }.sorted()[0]
+    private fun tournamentSelection(k: Int) = (1..k).map { population.random() }.sorted()[0].copy()
 
-    fun recombination(parents: List<Individual>): List<Individual> {
+    fun recombine(parents: List<Individual>): List<Individual> {
         val offsprings = mutableListOf<Individual>()
         for (i in parents.indices step 2) {
             val (a, b) = parents[i].crossoverAndMutate(parents[i+1], crossoverRate, mutationRate)
