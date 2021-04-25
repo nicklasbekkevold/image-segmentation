@@ -2,13 +2,13 @@ import ga.GeneticAlgorithm
 import ga.Initialization
 import kotlin.system.measureTimeMillis
 
-const val imageDirectory = "86016"
-const val generations = 0
+const val imageDirectory = "118035"
+const val generations = 100
 const val tournamentSize = 4
 const val crossoverRate = 0.7f
 const val mutationRate = 0.2f
-const val populationSize = 10
-val initialization = Initialization.HeuristicClustering()
+const val populationSize = 50
+val initialization = Initialization.HeuristicPrim()
 
 const val multiObjective = true
 const val overallDeviationWeight = 0.05

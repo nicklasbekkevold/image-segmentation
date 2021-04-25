@@ -14,7 +14,7 @@ import javafx.scene.image.PixelReader;
  * the "feedbackStation" object, wrapping this object in a Thread object, then calling start() on that thread. 
  * You will need to implement the FeedbackStation interface yourselves.
  */
-public final class Evaluator implements Runnable{
+public final class Evaluator implements Runnable {
 	String optFolder = "EVALUATOR/optimal/blackWhite/";
 	String studFolder = "EVALUATOR/student/blackWhite/";
 
@@ -154,4 +154,10 @@ public final class Evaluator implements Runnable{
 			studImages.add(new Image(f.toURI().toString(), false)); // true is for background loading
 		}
 	}
+
+	public static void main(String[] args) {
+		Evaluator e = new Evaluator();
+		e.runSameThread();
+	}
 }
+
