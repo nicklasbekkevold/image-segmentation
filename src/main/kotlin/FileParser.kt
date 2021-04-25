@@ -7,8 +7,8 @@ import java.util.*
 import javax.imageio.ImageIO
 
 private val imagesPath: String = File("src/main/resources/training_images").absolutePath
-private val studentPathBlackAndWhite: String = File("src/main/EVALUATOR/student/blackWhite/").absolutePath
-private val studentPathGreen: String = File("src/main/EVALUATOR/student/green/").absolutePath
+private val optimalPath: String = File("src/main/scripts/Optimal_Segmentation_Files").absolutePath
+private val studentPath: String = File("src/main/scripts/Student_Segmentation_Files").absolutePath
 
 fun getImageDirectories(): List<String> {
     val imagesDirectory = File(imagesPath)
@@ -26,13 +26,22 @@ fun getTestImageFromDirectory(directoryName: String): BufferedImage {
     return ImageIO.read(File(imagePath))
 }
 
+fun copyGroundTruthImages(directoryName: String) {
+    val imageDirectory = "$imagesPath/$directoryName"
+    for (file in Objects.requireNonNull(File(imageDirectory).listFiles())) {
+        if (file.name.contains("GT_")) {
+            file.copyTo(File("$optimalPath/${file.name}"))
+        }
+    }
+}
+
 fun deleteImages() {
-    for (file in Objects.requireNonNull(File(studentPathGreen).listFiles())) {
+    for (file in Objects.requireNonNull(File(optimalPath).listFiles())) {
         if (!file.isDirectory) {
             file.delete()
         }
     }
-    for (file in Objects.requireNonNull(File(studentPathBlackAndWhite).listFiles())) {
+    for (file in Objects.requireNonNull(File(studentPath).listFiles())) {
         if (!file.isDirectory) {
             file.delete()
         }
@@ -40,7 +49,7 @@ fun deleteImages() {
 }
 
 fun writeBlackAndWhiteImageToFile(filename: String, individual: Individual) {
-    val imagePath = "$studentPathBlackAndWhite/$filename.jpg"
+    val imagePath = "$studentPath/${filename}_BLACKANDWHITE.jpg"
     val bufferedImage = BufferedImage(Image.width, Image.height, BufferedImage.TYPE_INT_RGB)
     for (y in 0 until Image.height) {
         for (x in 0 until Image.width) {
@@ -55,7 +64,7 @@ fun writeBlackAndWhiteImageToFile(filename: String, individual: Individual) {
 }
 
 fun writeGreenEdgeImageToFile(filename: String, individual: Individual) {
-    val imagePath = "$studentPathGreen/$filename.jpg"
+    val imagePath = "$studentPath/${filename}_GREEN.jpg"
     val bufferedImage = Image.image.deepCopy()
     for (y in 0 until Image.height) {
         for (x in 0 until Image.width) {
