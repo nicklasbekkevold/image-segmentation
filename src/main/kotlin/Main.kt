@@ -11,9 +11,9 @@ const val populationSize = 50
 val initialization = Initialization.Random()
 
 const val multiObjective = true
-const val overallDeviationWeight = 0.05
-const val edgeValueWeight = 1
-const val connectivityMeasureWeight = 1
+const val overallDeviationWeight = 10
+const val edgeValueWeight = 2
+const val connectivityMeasureWeight = 100
 
 fun main() {
     deleteImages()

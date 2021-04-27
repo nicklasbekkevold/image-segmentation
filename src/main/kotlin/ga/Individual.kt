@@ -1,9 +1,12 @@
 package ga
 
+import connectivityMeasureWeight
 import domain.Image
 import domain.index
 import domain.twoConnectedNeighborhood
+import edgeValueWeight
 import initialization
+import overallDeviationWeight
 import kotlin.random.Random
 
 class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : Comparable<Individual> {
@@ -13,6 +16,7 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
 
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
 
+    var fitness = Float.MAX_VALUE // inverted fitness for this problem
     var rank = Int.MAX_VALUE
     var crowdingDistance = Float.MIN_VALUE
     var dominationCount = 0
@@ -22,7 +26,7 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
         return Individual(genotype, phenotype)
     }
 
-    // Just for fun. Renames .indices to .loci to match the nomenclature
+    // Just for fun. Renames .indices to .loci to match the nomenclature. Low is good
     private val List<Gene>.loci: IntRange
         get() = this.indices
 
@@ -63,6 +67,12 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
         return objectiveValues.computeIfAbsent(objectiveFunction) { objectiveFunction.apply(phenotype) }
     }
 
+    fun computeFitness() {
+        fitness = overallDeviationWeight * getOrEvaluate(ObjectiveFunction.OverallDeviation)
+            + edgeValueWeight * getOrEvaluate(ObjectiveFunction.EdgeValue)
+            + connectivityMeasureWeight * getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)
+    }
+
     fun crossoverAndMutate(other: Individual, crossoverRate: Float, mutationRate: Float): Pair<Individual, Individual> {
         require(genotype.size == other.genotype.size)
         val thisOffspringGenotype = mutableListOf<Gene>().also { it.addAll(genotype) }
@@ -97,6 +107,7 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
     override fun compareTo(other: Individual): Int {
         return compareBy<Individual> { it.rank }
             .thenByDescending { it.crowdingDistance } // high crowding distance means less crowded
+            .thenBy { it.fitness } // Not used simultaneous with rank and crowdingDistance
             .compare(this, other)
     }
 
@@ -110,4 +121,5 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
         dominationCount = 0
         dominates = mutableListOf()
     }
+
 }

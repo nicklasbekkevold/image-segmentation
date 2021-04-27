@@ -2,6 +2,7 @@ package ga
 
 import crossoverRate
 import initialization
+import multiObjective
 import mutationRate
 import populationSize
 import kotlin.math.abs
@@ -9,13 +10,13 @@ import kotlin.math.abs
 class GeneticAlgorithm {
 
     private var population: Population
-    private var paretoFront: List<Individual>
+    private var paretoFront: List<Individual> = listOf()
+    private val updateFunction = if (multiObjective) updateNSGAII else updateSGA
 
     init {
         printParameters()
         population = Population(populationSize)
-        val fronts = population.evaluate()
-        paretoFront = fronts.first()
+        population.evaluate()
     }
 
     private fun printParameters() {
@@ -29,29 +30,43 @@ class GeneticAlgorithm {
     }
 
     fun update(): Population {
-        // Evaluation step implicitly done from previous loop
+        return updateFunction()
+    }
 
-        val parents = population.select() // P_t
-        val offsprings = population.recombine(parents) // Q_t
-        val combinedPopulation = parents + offsprings // R_t
-
-        val fronts = fastNonDominatedSort(combinedPopulation)
-        paretoFront = fronts.first()
-
-        val resultPopulation = mutableListOf<Individual>()
-        var i = 0
-        while (resultPopulation.size + fronts[i].size <= populationSize) {
-            crowdingDistanceAssignment(fronts[i])
-            resultPopulation.addAll(fronts[i++])
+    private val updateSGA: () -> Population
+        get() = {
+            // Evaluation step implicitly done from previous loop
+            population.evaluate()
+            val parents = population.select() // P_t
+            val offsprings = population.recombine(parents) // Q_t
+            population = population.replace(offsprings)
+            population
         }
 
-        crowdingDistanceAssignment(fronts[i])
-        val difference = populationSize - resultPopulation.size
-        resultPopulation.addAll(fronts[i].sorted().subList(0, difference))
+    private val updateNSGAII: () -> Population
+        get() = {
+            // Evaluation step implicitly done from previous loop
+            val parents = population.select() // P_t
+            val offsprings = population.recombine(parents) // Q_t
+            val combinedPopulation = parents + offsprings // R_t
 
-        population = population.replace(resultPopulation)
-        return population
-    }
+            val fronts = fastNonDominatedSort(combinedPopulation)
+            paretoFront = fronts.first()
+
+            val resultPopulation = mutableListOf<Individual>()
+            var i = 0
+            while (resultPopulation.size + fronts[i].size <= populationSize) {
+                crowdingDistanceAssignment(fronts[i])
+                resultPopulation.addAll(fronts[i++])
+            }
+
+            crowdingDistanceAssignment(fronts[i])
+            val difference = populationSize - resultPopulation.size
+            resultPopulation.addAll(fronts[i].sorted().subList(0, difference))
+
+            population = population.replace(resultPopulation)
+            population
+        }
 
     companion object {
         fun fastNonDominatedSort(population: List<Individual>): List<List<Individual>> {

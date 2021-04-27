@@ -1,12 +1,14 @@
 package ga
 
 import crossoverRate
+import multiObjective
 import mutationRate
 import tournamentSize
 
 class Population(private val population: List<Individual>, private val generation: Int): Iterable<Individual> {
 
     constructor(populationSize: Int) : this((1..populationSize).map { Individual() }, 0)
+    private val evaluationFunction = if (multiObjective) evaluateNSGAII else evaluateSGA
 
     val size: Int
         get() {
@@ -17,9 +19,19 @@ class Population(private val population: List<Individual>, private val generatio
         return population[index]
     }
 
-    fun evaluate(): List<List<Individual>> {
-        return GeneticAlgorithm.fastNonDominatedSort(population)
+    fun evaluate() {
+        evaluationFunction(population)
     }
+
+    private val evaluateSGA: (population: List<Individual>) -> Unit
+        get() = {
+            population.forEach { it.computeFitness() }
+        }
+
+    private val evaluateNSGAII: (population: List<Individual>) -> Unit
+        get() = {
+            GeneticAlgorithm.fastNonDominatedSort(population)
+        }
 
     fun select(): List<Individual> = population.map { tournamentSelection(tournamentSize) }
 
