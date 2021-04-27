@@ -118,6 +118,9 @@ class GeneticAlgorithm {
 
     fun exit(): List<Individual> {
         println("Genetic algorithm exit.")
-        return paretoFront
+        if (paretoFront.isNotEmpty()) {
+            return paretoFront
+        }
+        return population.getElite(populationSize/10)
     }
 }

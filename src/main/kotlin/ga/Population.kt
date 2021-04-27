@@ -54,4 +54,8 @@ class Population(private val population: List<Individual>, private val generatio
     override fun iterator(): Iterator<Individual> {
         return population.iterator()
     }
+
+    fun getElite(eliteSize: Int): List<Individual> {
+        return population.sorted().subList(0, eliteSize)
+    }
 }
