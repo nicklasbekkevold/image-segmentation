@@ -25,7 +25,8 @@ class GeneticAlgorithm {
             ┝ population size: $populationSize
             ┝ crossover rate: $crossoverRate
             ┝ mutation rate: $mutationRate
-            ┕ initialization: ${initialization.name}
+            ┝ initialization: ${initialization.name}
+            ┕ algorithm: ${if (multiObjective) "NSGA-II" else "SGA"}
         """.trimIndent())
     }
 
@@ -118,9 +119,9 @@ class GeneticAlgorithm {
 
     fun exit(): List<Individual> {
         println("Genetic algorithm exit.")
-        if (paretoFront.isNotEmpty()) {
+        if (multiObjective) {
             return paretoFront
         }
-        return population.getElite(populationSize/10)
+        return population.getElite(populationSize / 10)
     }
 }

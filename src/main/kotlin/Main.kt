@@ -3,7 +3,7 @@ import ga.Initialization
 import kotlin.system.measureTimeMillis
 
 const val imageDirectory = "86016"
-const val generations = 10
+const val generations = 100
 const val tournamentSize = 4
 const val crossoverRate = 0.7f
 const val mutationRate = 0.2f
