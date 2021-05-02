@@ -2,6 +2,7 @@ package ga
 
 import connectivityMeasureWeight
 import domain.Image
+import domain.ObjectiveFunction
 import domain.index
 import domain.twoConnectedNeighborhood
 import edgeValueWeight
@@ -71,7 +72,6 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
         fitness = overallDeviationWeight * getOrEvaluate(ObjectiveFunction.OverallDeviation)
             + edgeValueWeight * getOrEvaluate(ObjectiveFunction.EdgeValue)
             + connectivityMeasureWeight * getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)
-//            + 10000 * getOrEvaluate(ObjectiveFunction.NumberOfSegments)
     }
 
     fun crossoverAndMutate(other: Individual, crossoverRate: Float, mutationRate: Float): Pair<Individual, Individual> {
@@ -82,18 +82,15 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
             val crossoverPoint = 1 + Random.nextInt(genotype.size - 1)
             for (locus in crossoverPoint until genotype.size) {
                 thisOffspringGenotype[locus] = other.genotype[locus].also { otherOffspringGenotype[locus] = genotype[locus] }
-                if (Random.nextFloat() < mutationRate) thisOffspringGenotype[locus] = Gene.values().random()
-                if (Random.nextFloat() < mutationRate) otherOffspringGenotype[locus] = Gene.values().random()
             }
-        } else {
-            if (Random.nextFloat() < mutationRate) {
-                val locus = Random.nextInt(0, genotype.size)
-                thisOffspringGenotype[locus] = Gene.values().random()
-            }
-            if (Random.nextFloat() < mutationRate) {
-                val locus = Random.nextInt(0, genotype.size)
-                otherOffspringGenotype[locus] = Gene.values().random()
-            }
+        }
+        if (Random.nextFloat() < mutationRate) {
+            val locus = Random.nextInt(0, genotype.size)
+            thisOffspringGenotype[locus] = Gene.values().random()
+        }
+        if (Random.nextFloat() < mutationRate) {
+            val locus = Random.nextInt(0, genotype.size)
+            otherOffspringGenotype[locus] = Gene.values().random()
         }
         return Pair(Individual(correctBorderNodes(thisOffspringGenotype)), Individual(correctBorderNodes(otherOffspringGenotype)))
     }
@@ -117,7 +114,8 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
     }
 
     override fun toString(): String {
-        return "segments=${phenotype.toSet().size}_connectivity=${getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)}_edgeValue=${-getOrEvaluate(ObjectiveFunction.EdgeValue)}_overallDeviation=${getOrEvaluate(ObjectiveFunction.OverallDeviation)}"
+        return "segments=${phenotype.toSet().size}_connectivity=${getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)}_edgeValue=${-getOrEvaluate(
+            ObjectiveFunction.EdgeValue)}_overallDeviation=${getOrEvaluate(ObjectiveFunction.OverallDeviation)}"
     }
 
     fun reset() {

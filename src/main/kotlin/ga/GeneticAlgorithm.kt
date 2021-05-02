@@ -1,6 +1,7 @@
 package ga
 
 import crossoverRate
+import domain.ObjectiveFunction
 import initialization
 import multiObjective
 import mutationRate
@@ -72,7 +73,7 @@ class GeneticAlgorithm {
     companion object {
         fun fastNonDominatedSort(population: List<Individual>): List<List<Individual>> {
             population.forEach { it.reset() }
-            for(i in population.indices) {
+            for (i in population.indices) {
                 val p = population[i]
                 for (j in i + 1 until population.size) {
                     val q = population[j]

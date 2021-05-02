@@ -36,6 +36,11 @@ fun deleteImages() {
             file.delete()
         }
     }
+    for (file in Objects.requireNonNull(File(studentPathGreen).listFiles())) {
+        if (!file.isDirectory) {
+            file.delete()
+        }
+    }
 }
 
 fun writeGreenEdgeImageToFile(filename: String, individual: Individual) {

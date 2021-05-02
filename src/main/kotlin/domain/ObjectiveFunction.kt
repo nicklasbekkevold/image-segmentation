@@ -1,8 +1,4 @@
-package ga
-
-import domain.Image
-import domain.mooreNeighborhood
-import domain.vonNeumannNeighborhood
+package domain
 
 enum class ObjectiveFunction {
     OverallDeviation {

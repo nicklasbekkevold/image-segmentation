@@ -105,6 +105,7 @@ fun makePhenotype(genotype: List<Gene>): List<Int> {
         }
 
         val currentSegment = mutableListOf<Int>()
+        currentSegment.add(i)
         segments[i] = segmentId
 
         var currentNode = genotype[i] + Image.indexToCoordinate(i)

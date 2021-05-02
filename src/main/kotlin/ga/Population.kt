@@ -4,6 +4,8 @@ import crossoverRate
 import multiObjective
 import mutationRate
 import tournamentSize
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class Population(private val population: List<Individual>, private val generation: Int): Iterable<Individual> {
 
@@ -33,7 +35,7 @@ class Population(private val population: List<Individual>, private val generatio
             GeneticAlgorithm.fastNonDominatedSort(population)
         }
 
-    fun select(): List<Individual> = population.map { tournamentSelection(tournamentSize) }
+    fun select(): List<Individual> = population.map { tournamentSelection(tournamentSize) }.shuffled()
 
     private fun tournamentSelection(k: Int) = (1..k).map { population.random() }.sorted()[0].copy()
 
