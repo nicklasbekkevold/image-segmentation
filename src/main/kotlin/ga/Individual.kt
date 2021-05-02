@@ -16,7 +16,7 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
 
     private val objectiveValues = mutableMapOf<ObjectiveFunction, Float>()
 
-    var fitness = Float.MAX_VALUE // inverted fitness for this problem
+    private var fitness = Float.MAX_VALUE // inverted fitness for this problem
     var rank = Int.MAX_VALUE
     var crowdingDistance = Float.MIN_VALUE
     var dominationCount = 0
@@ -71,6 +71,7 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
         fitness = overallDeviationWeight * getOrEvaluate(ObjectiveFunction.OverallDeviation)
             + edgeValueWeight * getOrEvaluate(ObjectiveFunction.EdgeValue)
             + connectivityMeasureWeight * getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)
+//            + 10000 * getOrEvaluate(ObjectiveFunction.NumberOfSegments)
     }
 
     fun crossoverAndMutate(other: Individual, crossoverRate: Float, mutationRate: Float): Pair<Individual, Individual> {
@@ -85,9 +86,13 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
                 if (Random.nextFloat() < mutationRate) otherOffspringGenotype[locus] = Gene.values().random()
             }
         } else {
-            for (locus in genotype.loci) {
-                if (Random.nextFloat() < mutationRate) thisOffspringGenotype[locus] = Gene.values().random()
-                if (Random.nextFloat() < mutationRate) otherOffspringGenotype[locus] = Gene.values().random()
+            if (Random.nextFloat() < mutationRate) {
+                val locus = Random.nextInt(0, genotype.size)
+                thisOffspringGenotype[locus] = Gene.values().random()
+            }
+            if (Random.nextFloat() < mutationRate) {
+                val locus = Random.nextInt(0, genotype.size)
+                otherOffspringGenotype[locus] = Gene.values().random()
             }
         }
         return Pair(Individual(correctBorderNodes(thisOffspringGenotype)), Individual(correctBorderNodes(otherOffspringGenotype)))
@@ -112,7 +117,7 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
     }
 
     override fun toString(): String {
-        return "Individual(rank=$rank, crowdingDistance=$crowdingDistance, segments=${phenotype.toSet()})"
+        return "segments=${phenotype.toSet().size}_connectivity=${getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)}_edgeValue=${-getOrEvaluate(ObjectiveFunction.EdgeValue)}_overallDeviation=${getOrEvaluate(ObjectiveFunction.OverallDeviation)}"
     }
 
     fun reset() {

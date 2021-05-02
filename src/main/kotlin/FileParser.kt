@@ -9,17 +9,7 @@ import javax.imageio.ImageIO
 private val imagesPath: String = File("src/main/resources/training_images").absolutePath
 private val optimalPath: String = File("src/main/scripts/Optimal_Segmentation_Files").absolutePath
 private val studentPath: String = File("src/main/scripts/Student_Segmentation_Files").absolutePath
-
-fun getImageDirectories(): List<String> {
-    val imagesDirectory = File(imagesPath)
-    require(imagesDirectory.exists() && imagesDirectory.isDirectory)
-    return imagesDirectory
-        .walk()
-        .maxDepth(1)
-        .filter { it != imagesDirectory }
-        .map { it.name }
-        .toList()
-}
+private val studentPathGreen: String = File("src/main/scripts/Student_Segmentation_Files_Green").absolutePath
 
 fun getTestImageFromDirectory(directoryName: String): BufferedImage {
     val imagePath = "$imagesPath/$directoryName/Test image.jpg"
@@ -48,12 +38,25 @@ fun deleteImages() {
     }
 }
 
+fun writeGreenEdgeImageToFile(filename: String, individual: Individual) {
+    val imagePath = "$studentPathGreen/${filename}.jpg"
+    val bufferedImage = Image.image.deepCopy()
+    for (y in 0 until Image.height) {
+        for (x in 0 until Image.width) {
+            if (individual.edgeAt(x, y) or Image.isEdge(x, y)) {
+                bufferedImage.setRGB(x, y, Color.GREEN.rgb)
+            }
+        }
+    }
+    ImageIO.write(bufferedImage, "jpg", File(imagePath))
+}
+
 fun writeBlackAndWhiteImageToFile(filename: String, individual: Individual) {
-    val imagePath = "$studentPath/${filename}_BLACKANDWHITE.jpg"
+    val imagePath = "$studentPath/${filename}.jpg"
     val bufferedImage = BufferedImage(Image.width, Image.height, BufferedImage.TYPE_INT_RGB)
     for (y in 0 until Image.height) {
         for (x in 0 until Image.width) {
-            if (individual.edgeAt(x, y)) {
+            if (individual.edgeAt(x, y) or Image.isEdge(x, y)) {
                 bufferedImage.setRGB(x, y, Color.BLACK.rgb)
             } else {
                 bufferedImage.setRGB(x, y, Color.WHITE.rgb)
@@ -63,22 +66,9 @@ fun writeBlackAndWhiteImageToFile(filename: String, individual: Individual) {
     ImageIO.write(bufferedImage, "jpg", File(imagePath))
 }
 
-fun writeGreenEdgeImageToFile(filename: String, individual: Individual) {
-    val imagePath = "$studentPath/${filename}_GREEN.jpg"
-    val bufferedImage = Image.image.deepCopy()
-    for (y in 0 until Image.height) {
-        for (x in 0 until Image.width) {
-            if (individual.edgeAt(x, y)) {
-                bufferedImage.setRGB(x, y, Color.GREEN.rgb)
-            }
-        }
-    }
-    ImageIO.write(bufferedImage, "jpg", File(imagePath))
-}
-
-fun BufferedImage.deepCopy(): BufferedImage {
-    val colorModel = this.colorModel;
-    val isAlphaPremultiplied = colorModel.isAlphaPremultiplied;
-    val raster = this.copyData(null);
-    return BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
+private fun BufferedImage.deepCopy(): BufferedImage {
+    val colorModel = this.colorModel
+    val isAlphaPremultiplied = colorModel.isAlphaPremultiplied
+    val raster = this.copyData(null)
+    return BufferedImage(colorModel, raster, isAlphaPremultiplied, null)
 }

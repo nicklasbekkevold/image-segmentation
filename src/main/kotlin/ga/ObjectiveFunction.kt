@@ -52,6 +52,13 @@ enum class ObjectiveFunction {
             return connectivity
         }
     };
+//    ,
+//    NumberOfSegments {
+//        // minimize
+//        override fun apply(segments: List<Int>): Float {
+//            return segments.toSet().size.toFloat()
+//        }
+//    };
 
     abstract fun apply(segments: List<Int>): Float
 }

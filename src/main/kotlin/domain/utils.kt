@@ -6,8 +6,8 @@ val Int.twoConnectedNeighborhood: List<Int>
     get() {
         val twoConnectedNeighborhood = mutableListOf<Int>()
         val (x, y) = Image.indexToCoordinate(this)
-        if (y > 0) twoConnectedNeighborhood.add(this - Image.width) // N
-        if (x > 0) twoConnectedNeighborhood.add(this - 1) // W
+        if (this % Image.width != 0 && y < Image.height - 1) twoConnectedNeighborhood.add(this + Image.width) // S
+        if (x < Image.width - 1) twoConnectedNeighborhood.add(this + 1) // E
         return twoConnectedNeighborhood
     }
 

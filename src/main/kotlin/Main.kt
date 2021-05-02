@@ -8,11 +8,11 @@ const val tournamentSize = 4
 const val crossoverRate = 0.7f
 const val mutationRate = 0.2f
 const val populationSize = 50
-val initialization = Initialization.Random()
+val initialization = Initialization.HeuristicPrim()
 
-const val multiObjective = false
-const val overallDeviationWeight = 10
-const val edgeValueWeight = 2
+const val multiObjective = true
+const val overallDeviationWeight = 2
+const val edgeValueWeight = 1
 const val connectivityMeasureWeight = 100
 
 fun main() {
@@ -34,7 +34,7 @@ fun main() {
 
     val elite = geneticAlgorithm.exit()
     for (i in elite.indices) {
-        writeBlackAndWhiteImageToFile("s$i", elite[i])
-        writeGreenEdgeImageToFile("s$i", elite[i])
+        writeGreenEdgeImageToFile("b$i (${elite[i]})", elite[i])
+        writeBlackAndWhiteImageToFile("g$i (${elite[i]})", elite[i])
     }
 }

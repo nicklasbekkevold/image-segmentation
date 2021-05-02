@@ -108,7 +108,7 @@ class GeneticAlgorithm {
                 population.sortedWith { i1, i2 -> i1.compareToWith(i2, objectiveFunction) }
                 population[0].crowdingDistance = Float.MAX_VALUE
                 population[l-1].crowdingDistance = Float.MAX_VALUE
-                val maxLength = population[l-1].getOrEvaluate(objectiveFunction) - population[0].getOrEvaluate(objectiveFunction)  // max - min
+                val maxLength = abs(population[l-1].getOrEvaluate(objectiveFunction) - population[0].getOrEvaluate(objectiveFunction))  // max - min
                 for (i in 1 until l-1) {
                     val length = abs(population[i+1].getOrEvaluate(objectiveFunction) - population[i-1].getOrEvaluate(objectiveFunction))
                     population[i].crowdingDistance += length / maxLength
@@ -120,8 +120,11 @@ class GeneticAlgorithm {
     fun exit(): List<Individual> {
         println("Genetic algorithm exit.")
         if (multiObjective) {
+            if (paretoFront.size > 5) {
+                return paretoFront.subList(0, 5)
+            }
             return paretoFront
         }
-        return population.getElite(populationSize / 10)
+        return population.getElite(5)
     }
 }

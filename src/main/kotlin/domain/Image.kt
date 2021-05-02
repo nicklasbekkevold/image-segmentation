@@ -52,6 +52,10 @@ object Image: Iterable<Int> {
         return ((red and 255) shl 16) or ((green and 255) shl 8) or (blue and 255)
     }
 
+    fun isEdge(x: Int, y: Int): Boolean {
+        return x == 0 || y == 0 || x == (width - 1) || y == (height - 1)
+    }
+
     override fun iterator(): Iterator<Int> {
         return pixels.flatten().iterator()
     }
