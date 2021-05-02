@@ -6,6 +6,7 @@ import initialization
 import multiObjective
 import mutationRate
 import populationSize
+import writeParetoFrontToFile
 import kotlin.math.abs
 
 class GeneticAlgorithm {
@@ -54,6 +55,7 @@ class GeneticAlgorithm {
 
             val fronts = fastNonDominatedSort(combinedPopulation)
             paretoFront = fronts.first()
+            println("Pareto front size: ${paretoFront.size}")
 
             val resultPopulation = mutableListOf<Individual>()
             var i = 0
@@ -121,6 +123,7 @@ class GeneticAlgorithm {
     fun exit(): List<Individual> {
         println("Genetic algorithm exit.")
         if (multiObjective) {
+            writeParetoFrontToFile(paretoFront)
             if (paretoFront.size > 5) {
                 return paretoFront.subList(0, 5)
             }

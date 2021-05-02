@@ -114,8 +114,8 @@ class Individual(private val genotype: List<Gene>, val phenotype: List<Int>) : C
     }
 
     override fun toString(): String {
-        return "segments=${phenotype.toSet().size}_connectivity=${getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)}_edgeValue=${-getOrEvaluate(
-            ObjectiveFunction.EdgeValue)}_overallDeviation=${getOrEvaluate(ObjectiveFunction.OverallDeviation)}"
+        return "segments=${phenotype.toSet().size}, connectivity=${getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)}, edgeValue=${-getOrEvaluate(
+            ObjectiveFunction.EdgeValue)}, overallDeviation=${getOrEvaluate(ObjectiveFunction.OverallDeviation)}"
     }
 
     fun reset() {

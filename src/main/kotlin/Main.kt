@@ -8,7 +8,7 @@ const val populationSize = 50
 const val tournamentSize = 4
 const val crossoverRate = 0.7f
 const val mutationRate = 0.2f
-val initialization = Initialization.HeuristicPrim()
+val initialization = Initialization.HeuristicClustering()
 
 const val multiObjective = true
 const val overallDeviationWeight = 2

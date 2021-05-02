@@ -1,4 +1,5 @@
 import domain.Image
+import domain.ObjectiveFunction
 import ga.Individual
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -69,6 +70,17 @@ fun writeBlackAndWhiteImageToFile(filename: String, individual: Individual) {
         }
     }
     ImageIO.write(bufferedImage, "jpg", File(imagePath))
+}
+
+fun writeParetoFrontToFile(paretoFront: List<Individual>) {
+    val file = File("src/main/scripts/paretoFront.txt")
+    file.printWriter().use { out ->
+        for (individual in paretoFront) {
+            out.print("${individual.getOrEvaluate(ObjectiveFunction.ConnectivityMeasure)},")
+            out.print("${-individual.getOrEvaluate(ObjectiveFunction.EdgeValue)},")
+            out.println(individual.getOrEvaluate(ObjectiveFunction.OverallDeviation))
+        }
+    }
 }
 
 private fun BufferedImage.deepCopy(): BufferedImage {

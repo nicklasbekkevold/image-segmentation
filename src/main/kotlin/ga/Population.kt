@@ -32,7 +32,8 @@ class Population(private val population: List<Individual>, private val generatio
 
     private val evaluateNSGAII: (population: List<Individual>) -> Unit
         get() = {
-            GeneticAlgorithm.fastNonDominatedSort(population)
+            val paretoFront = GeneticAlgorithm.fastNonDominatedSort(population).first()
+            println("Pareto front size: ${paretoFront.size}")
         }
 
     fun select(): List<Individual> = population.map { tournamentSelection(tournamentSize) }.shuffled()
